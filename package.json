@@ -13,9 +13,9 @@
   "scripts": {
     "start": "cross-env NODE_OPTIONS=--openssl-legacy-provider webpack-dev-server --mode development --output-public-path /",
     "prebuild": "rimraf ./build && mkdirp ./build",
-    "build": "NODE_OPTIONS=--openssl-legacy-provider npm run prebuild && webpack --mode production --progress --output-public-path \"\"",
+    "build": "npm run prebuild && cross-env NODE_OPTIONS=--openssl-legacy-provider webpack --mode production --progress",
     "format": "prettier --write '*.js' 'src/**/*.js'",
-    "deploy": "NODE_OPTIONS=--openssl-legacy-provider npm run prebuild && webpack --mode production --progress && gh-pages -d build"
+    "deploy": "npm run build && gh-pages -d build"
   },
   "dependencies": {
     "cannon-es": "^0.20.0",

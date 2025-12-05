@@ -36,6 +36,20 @@ class SeedScene extends Scene {
         this.timerDiv.style.pointerEvents = 'none'; // Let clicks pass through
         document.body.appendChild(this.timerDiv);
 
+        // --- INSTRUCTIONS UI ---
+        this.instructionsDiv = document.createElement('div');
+        this.instructionsDiv.style.position = 'absolute';
+        this.instructionsDiv.style.top = '80px'; // Positioned below the timer
+        this.instructionsDiv.style.width = '100%';
+        this.instructionsDiv.style.textAlign = 'center';
+        this.instructionsDiv.style.color = '#eeeeee';
+        this.instructionsDiv.style.fontSize = '16px';
+        this.instructionsDiv.style.fontFamily = 'Arial, sans-serif';
+        this.instructionsDiv.style.textShadow = '1px 1px 2px #000000';
+        this.instructionsDiv.style.pointerEvents = 'none';
+        this.instructionsDiv.innerHTML = 'WASD / Arrows to Move | SPACE to Jump | R to Reset Camera';
+        document.body.appendChild(this.instructionsDiv);
+
         // Init physics world
         this.world = new CANNON.World();
         this.world.gravity.set(0, -9.82, 0); 
@@ -45,7 +59,7 @@ class SeedScene extends Scene {
         // Set background to a nice color
         this.background = new Color(0x7ec0ee);
 
-        // --- 3x3 ISLAND GRID GENERATION (STATIC) ---
+        // --- 3x3 ISLAND GRID ---
         const spacing = 12; // Distance between island centers
         const boxSize = 4.3; // Half-width of the physics box
 
@@ -74,6 +88,7 @@ class SeedScene extends Scene {
         this.nextWindChange = 0; // Timestamp for next change
 
         // 2. Wind Visualizer (Arrow)
+        // Red arrow pointing in direction of wind
         const dir = new Vector3(1, 0, 0);
         const origin = new Vector3(0, 0, 0);
         const length = 1;
@@ -115,10 +130,13 @@ class SeedScene extends Scene {
 
     // Helper to generate new random wind
     updateWind() {
+        // Random Angle (0 to 2PI)
         const angle = Math.random() * Math.PI * 2;
+        
+        // Random Strength (100 to 300)
         const strength = 190 + Math.random(); // Adjusted strength
 
-        // Update Physics Vector (X and Z only)
+        // Update Physics Vector (X and Z only, don't blow up/down)
         this.windVector.set(
             Math.cos(angle) * strength,
             0,
@@ -126,8 +144,10 @@ class SeedScene extends Scene {
         );
 
         // Update Visual Arrow
+        // Normalize direction for the arrow helper
         const arrowDir = new Vector3(this.windVector.x, 0, this.windVector.z).normalize();
         this.windArrow.setDirection(arrowDir);
+        // Scale arrow length based on strength (visual feedback)
         this.windArrow.setLength(strength / 50); 
 
         // Update GUI text
@@ -148,11 +168,12 @@ class SeedScene extends Scene {
 
         // --- WIND LOGIC ---
         if (this.state.windEnabled) {
-            this.windArrow.visible = true; 
+            this.windArrow.visible = true; // Show arrow
 
-            // 1. Check if it's time to change wind
+            // 1. Check if it's time to change wind (every 3 to 6 seconds)
             if (timeStamp > this.nextWindChange) {
                 this.updateWind();
+                // Set next change time (current time + 3000ms + random 0-3000ms)
                 this.nextWindChange = timeStamp + 3000 + Math.random() * 3000;
             }
 
@@ -164,11 +185,11 @@ class SeedScene extends Scene {
                 
                 // 3. Move Visual Arrow to follow player
                 this.windArrow.position.copy(this.player.position);
-                this.windArrow.position.y += 2.5; 
+                this.windArrow.position.y += 2.5; // Hover above ball
             }
         } else {
             // Wind Disabled
-            this.windArrow.visible = false; 
+            this.windArrow.visible = false; // Hide arrow
             this.state.windStatus = 'Off';
         }
 
