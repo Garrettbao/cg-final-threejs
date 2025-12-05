@@ -1,6 +1,6 @@
 {
   "name": "rolling-island-adventure",
-  "repository": "three-seed",
+  "repository": "cg-final-threejs",
   "version": "0.1.0",
   "title": "Rolling Island Adventure",
   "description": "A physics-based platformer built on ThreeJS",
